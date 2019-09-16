@@ -32,6 +32,9 @@ class Example(Frame):
         # Label - directory
         label1 = Label(grp_sup_srch, textvariable = self.s_dir1, width=40)
         label1.grid(row=0, column=1)
+        # Load file list button
+        btn_load_list = Button(grp_sup_srch, text="Load from file", command=self.load_sup_file)
+        btn_load_list.grid(row=1, column=0)
         # Listbox
         lstbx_sup_lbl = Label(grp_sup_srch, text = "Superseded drawings:")
         lstbx_sup_lbl.grid(row=0, column=2)
@@ -72,10 +75,13 @@ class Example(Frame):
         lbl_tgt_dir = Label(grp_rev_cmp, text = "Target directory - current dwgs")
         lbl_tgt_dir.grid(row=2, column=0)
         btn_dir3_choose = Button(grp_rev_cmp, text="Browse...", command=self.choose_dir3)
-        btn_dir3_choose.grid(row=3,column=0) 
+        btn_dir3_choose.grid(row=3,column=0)
         # Label - second directory
         label3 = Label(grp_rev_cmp, textvariable = self.s_dir3, width=40)
         label3.grid(row=3, column=1)
+        # Load file list button
+        btn_load_cmp = Button(grp_rev_cmp, text="Load from file", command=self.load_cmp_file)
+        btn_load_cmp.grid(row=4, column=0)
         # Listbox - compare directories to find new revs
         lstbx_cmp_lbl = Label(grp_rev_cmp, text = "Found new revisions:")
         lstbx_cmp_lbl.grid(row=0, column=2)
@@ -83,13 +89,13 @@ class Example(Frame):
         self.lstbx_cmp.grid(row=1, column=2)
         # Compare button
         btn_cmp = Button(grp_rev_cmp, text="Compare", command=self.exec_cmp)
-        btn_cmp.grid(row=4, column=0)
+        btn_cmp.grid(row=5, column=0)
         # Save button
         btn_save_cmp = Button(grp_rev_cmp, text="Save to file", command=self.save_new_revs)
-        btn_save_cmp.grid(row=4, column=1)
+        btn_save_cmp.grid(row=5, column=1)
         # Copy button
-        btn_save_cmp = Button(grp_rev_cmp, text="Copy files", command=self.copy_new)
-        btn_save_cmp.grid(row=4, column=2)
+        btn_copy_cmp = Button(grp_rev_cmp, text="Copy files", command=self.copy_new)
+        btn_copy_cmp.grid(row=5, column=2)
 
 
         # Quit
@@ -112,6 +118,12 @@ class Example(Frame):
         for f in fl:
             self.lstbx_sup.insert("end", f)
 
+    def load_sup_file(self):
+        file_list = filedialog.askopenfilename()
+        files = [line.rstrip('\n') for line in open(file_list)]
+        for f in files:
+            self.lstbx_sup.insert("end", f)
+
     def save_superseded(self):
         f_sup = open("superseded.txt", "w")
         for f in self.lstbx_sup.get(0, "end"):
@@ -128,6 +140,12 @@ class Example(Frame):
         self.lstbx_cmp.delete(0, "end")
         fl = compare_new_revs(self.s_dir2.get(), self.s_dir3.get())
         for f in fl:
+            self.lstbx_cmp.insert("end", f)
+
+    def load_cmp_file(self):
+        file_list = filedialog.askopenfilename()
+        files = [line.rstrip('\n') for line in open(file_list)]
+        for f in files:
             self.lstbx_cmp.insert("end", f)
 
     def copy_new(self): 

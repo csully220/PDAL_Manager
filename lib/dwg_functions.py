@@ -8,9 +8,8 @@ import itertools
 
 def copy_files_from_list(from_dir="", to_dir="", file_list=""):
     if len(file_list) > 0:
-        with open(file_list) as fl:
-            files = fl.readlines()
-            files = [line.rstrip('\n') for line in open(files)]
+        files = [line.rstrip('\n') for line in open(file_list)]
+            
 
 
 
@@ -36,10 +35,6 @@ def compare_new_revs(dir1="", dir2=""):
                 cdwg_rev = cdwg_fn[-1]
                 if dwg_no == cdwg_no and dwg_ext == cdwg_ext and dwg_rev != cdwg_rev and min(dwg_rev,cdwg_rev) == cdwg_rev and not cfile in rtn_list:
                     rtn_list.append(file)
-                    #if min(dwg_rev,cdwg_rev) == dwg_rev and not cfile in rtn_list:
-                        #rtn_list.append(cfile)
-                    #elif min(dwg_rev,cdwg_rev) == cdwg_rev and not file in rtn_list:
-                        #rtn_list.append(file)
                     continue
         except Exception as e:
             print(repr(e) + '       ' + file)
