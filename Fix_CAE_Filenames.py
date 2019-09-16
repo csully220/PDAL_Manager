@@ -20,15 +20,15 @@ workdir = filedialog.askdirectory()
 # Do not remove the "r" from the front of the string and no trailing backslash. 
 # Enter just like this: r'C:\Users\You\path\to\files'
 
-print("CAE drawing file renaming tool")
-print("Select directory containing filenames to be fixed")
+#print("CAE drawing file renaming tool")
+#print("Select directory containing filenames to be fixed")
 #text = input("Enter directory: ")
 valid_prefixes = ['CA','MA','PS','WD','TS','UD','MD','FP','ED','CD','PD']
 valid_filetypes = ['pdf','dgn','dwg','dxf','xls','xlsx']
 
 os.chdir(workdir)
 print(os.getcwd())
-input("Press Enter to continue")
+input("Press Enter to continue or Ctrl+C to abort")
 files = os.listdir()
 
 def main():
@@ -89,7 +89,10 @@ def main():
                 continue
 
         except Exception as e:
-            print(repr(e) + '       ' + file)
+            if dwg_no and fn_ext and fn_ext in valid_filetypes:
+                new_fn = dwg_no + '.' + fn_ext
+                os.rename(file, new_fn)
+            #print(repr(e) + '       ' + file)
             continue
                      
     print('Renamed ' + str(counter) + ' files in ' + workdir)

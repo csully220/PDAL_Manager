@@ -37,6 +37,7 @@ class Example(Frame):
         btn_load_list.grid(row=1, column=0)
         # Listbox
         lstbx_sup_lbl = Label(grp_sup_srch, text = "Superseded drawings:")
+        lst
         lstbx_sup_lbl.grid(row=0, column=2)
         self.lstbx_sup = Listbox(grp_sup_srch, selectmode="extended")
         self.lstbx_sup.grid(row=1, column=2)
@@ -125,7 +126,7 @@ class Example(Frame):
             self.lstbx_sup.insert("end", f)
 
     def save_superseded(self):
-        f_sup = open("superseded.txt", "w")
+        f_sup = open(self.s_dir1.get() + "\\superseded.txt", "w")
         for f in self.lstbx_sup.get(0, "end"):
             f_sup.write(f + "\n")
         f_sup.close()
