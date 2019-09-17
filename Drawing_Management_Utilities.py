@@ -40,7 +40,6 @@ class Example(Frame):
         btn_load_list.grid(row=1, column=0)
         # Listbox
         lstbx_sup_lbl = Label(grp_sup_srch, text = "Superseded drawings:")
-        #lstbx.config(
         lstbx_sup_lbl.grid(row=0, column=2)
         self.lstbx_sup = Listbox(grp_sup_srch, selectmode="extended")
         self.lstbx_sup.grid(row=1, column=2)
@@ -99,7 +98,6 @@ class Example(Frame):
         grp_rev_cmp.rowconfigure(4, pad=20)
         # Load file list button
         btn_load_cmp = Button(grp_rev_cmp, text="Load from file", command=self.load_cmp_file)
-        #btn_load_cmp.config(pady=10)
         btn_load_cmp.grid(row=4, column=0)
         # Row 5
         grp_rev_cmp.rowconfigure(5, pad=20)
@@ -123,14 +121,17 @@ class Example(Frame):
         # Generate list of files
         btn_filelist = Button(grp_misc, text="Gen file list", command=self.save_file_list)
         btn_filelist.grid(row=0, column=0)
+        # Validate filenames
+        btn_validate = Button(grp_misc, text="Validate CAE filenames", command=self.val_filenames)
+        btn_validate.grid(row=0, column=1)
         # Check /pdf subdirectory for pdf corresponding to native files
         btn_verify_pdfs = Button(grp_misc, text="Check for PDFs", command=self.verify_pdfs)
-        btn_verify_pdfs.grid(row=0, column=1)
+        btn_verify_pdfs.grid(row=0, column=2)
         # Quit
         btn_quit = Button(grp_misc, text="Quit", command=self.master.destroy)
-        btn_quit.grid(row=0, column=2)
+        btn_quit.grid(row=0, column=3)
 
- 
+
     def choose_dir1(self): 
         self.s_dir1.set(filedialog.askdirectory()) 
  
@@ -157,7 +158,7 @@ class Example(Frame):
         for f in self.lstbx_sup.get(0, "end"):
             f_sup.write(f + "\n")
         f_sup.close()
-        popupmsg("List saved to " + self.s_dir3.get() + "\\superseded.txt")
+        popupmsg("List saved to " + self.s_dir1.get() + "\\superseded.txt")
 
     def save_new_revs(self):
         f_sup = open(self.s_dir3.get() + "\\new_revs.txt", "w")
@@ -211,8 +212,14 @@ class Example(Frame):
             msg_lbl = "Missing PDFs for:\n\n"
             for fn in no_pdfs:
                 msg_lbl += fn + "\n"
-            #no_pdfs = [fn + "\n" for fn in no_pdfs]
             popupmsg(msg_lbl)
+
+    def val_filenames(self):
+        files = os.listdir(filedialog.askdirectory())
+        for f in files:
+            if not validate_CAE_filename(f):
+                print(f)
+
 
 def popupmsg(msg):
     popup = Tk()
