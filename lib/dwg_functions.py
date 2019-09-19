@@ -43,12 +43,16 @@ def compare_new_revs(dir1="", dir2=""):
             dwg_no = "".join(dwg_fn[:-1])
             print(file)
             dwg_rev = dwg_fn[-1]
+            if len(dwg_fn) == 1:
+                dwg_rev = "-"
             for cfile in cfiles:
                 cfsp = cfile.split('.')
                 cdwg_ext = cfsp[-1]
                 cdwg_fn = cfsp[0].upper().split('_')
                 cdwg_no = "".join(cdwg_fn[:-1])
                 cdwg_rev = cdwg_fn[-1]
+                if len(cdwg_fn) == 1:
+                    cdwg_rev = "-"
                 if dwg_no == cdwg_no and dwg_ext == cdwg_ext and dwg_rev != cdwg_rev and min(dwg_rev,cdwg_rev) == cdwg_rev and not cfile in rtn_list:
                     rtn_list.append(file)
                     continue

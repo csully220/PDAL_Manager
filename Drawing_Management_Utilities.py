@@ -172,6 +172,7 @@ class Example(Frame):
         fl = compare_new_revs(self.s_dir2.get(), self.s_dir3.get())
         for f in fl:
             self.lstbx_cmp.insert("end", f)
+        popupmsg("Found " + str(self.lstbx_cmp.size()) + " possible new revisions")
 
     def load_cmp_file(self):
         file_list = filedialog.askopenfilename()
