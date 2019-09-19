@@ -122,14 +122,17 @@ class Example(Frame):
         btn_filelist = Button(grp_misc, text="Gen file list", command=self.save_file_list)
         btn_filelist.grid(row=0, column=0)
         # Validate filenames
-        btn_validate = Button(grp_misc, text="Validate CAE filenames", command=self.val_filenames)
+        btn_validate = Button(grp_misc, text="Check CAE filenames", command=self.val_filenames)
         btn_validate.grid(row=0, column=1)
         # Check /pdf subdirectory for pdf corresponding to native files
         btn_verify_pdfs = Button(grp_misc, text="Check for PDFs", command=self.verify_pdfs)
         btn_verify_pdfs.grid(row=0, column=2)
+        # Check /pdf subdirectory for pdf corresponding to native files
+        btn_verify_pdf_dates = Button(grp_misc, text="Check PDF mod date", command=self.verify_pdf_dates)
+        btn_verify_pdf_dates.grid(row=0, column=3)
         # Quit
         btn_quit = Button(grp_misc, text="Quit", command=self.master.destroy)
-        btn_quit.grid(row=0, column=3)
+        btn_quit.grid(row=0, column=4)
 
 
     def choose_dir1(self): 
@@ -215,6 +218,17 @@ class Example(Frame):
                 msg_lbl += fn + "\n"
             popupmsg(msg_lbl)
 
+    def verify_pdf_dates(self):
+        old_pdfs = check_for_old_pdfs(filedialog.askdirectory())
+        if len(old_pdfs) == 0:
+            popupmsg("All PDFs are current")
+        else:
+            msg_lbl = "Outdated PDFs:\n\n"
+            for fn in old_pdfs:
+                msg_lbl += fn + "\n"
+            popupmsg(msg_lbl)
+
+
     def val_filenames(self):
         files = os.listdir(filedialog.askdirectory())
         for f in files:
@@ -224,7 +238,7 @@ class Example(Frame):
 
 def popupmsg(msg):
     popup = Tk()
-    popup.wm_title("!")
+    popup.wm_title("Message")
     label = Label(popup, text=msg, font='serif 10')
     label.pack(side="top", fill="x", padx=40, pady=20)
     B1 = Button(popup, text="Okay", command = popup.destroy)

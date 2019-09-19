@@ -30,6 +30,31 @@ def check_for_pdfs(nat_dir=""):
                 rtn_list.append(nf)
     return rtn_list
 
+def check_for_old_pdfs(nat_dir=""):
+    rtn_list = []
+    if len(nat_dir) > 0:
+        files = os.listdir(nat_dir)
+        pdfs = os.listdir(nat_dir + "/pdf")
+        
+        for nf in files:
+            if os.path.isdir(nat_dir + "/" + nf):
+                continue
+            found = False
+            nf_split = nf.split('.')
+            nf_ext = nf_split[-1]
+            nf_base = nf_split[0].upper()
+            for pf in pdfs:
+                pf_split = pf.split('.')
+                pf_ext = pf_split[-1]
+                pf_base = pf_split[0].upper()
+                if pf_ext == "pdf" and nf_base == pf_base:
+                    nf_moddate = os.path.getmtime(nat_dir + "/" + nf)
+                    pdf_moddate = os.path.getmtime(nat_dir + "/pdf/" + pf)
+                    if pdf_moddate > (nf_moddate + 600):
+                        rtn_list.append(pf)
+                    break
+    return rtn_list
+
 def compare_new_revs(dir1="", dir2=""):
     #rtn_list = ["CA123456", "CA123457", "CA123458", "CA123459"]
     files = os.listdir(dir1)
