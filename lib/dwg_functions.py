@@ -146,6 +146,8 @@ def validate_CAE_filename(file=""):
         dwg_fd = dwg_sp[2]
         dwg_rev = dwg_sp[3]
 
+        if dwg_sp[-1] == 'FD' or dwg_sp[-1] == 'PL':
+            raise Exception( 'FD/PL appears at end of filename' )
         if not dwg_ext in valid_filetypes:
             raise Exception( 'Invalid filetype' )
 
@@ -167,5 +169,5 @@ def validate_CAE_filename(file=""):
         return True
 
     except Exception as e:
-        #print(repr(e) + '       ' + file)
+        print(repr(e) + '       ' + file)
         return False

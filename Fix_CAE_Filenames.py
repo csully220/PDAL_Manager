@@ -72,7 +72,9 @@ def main():
             # REVISION
             rev = None
             for s in dwg_sp[1:]:
-                if (len(s) == 1 or len(s) == 2) and (re.search("[A-Z]", s) or re.search("[A-Z]{2}", s) or s == '-') and (s != 'FD' and s != 'PL'):
+                if len(s) == 1 and (re.search("[A-Z]", s) or s == '-') :
+                    rev = s
+                elif len(s) == 2 and re.search("[A-Z]{2}", s) and (s != 'FD' and s != 'PL'):
                     rev = s
                 elif len(s) == 1 and s == '0':
                     rev = '-'

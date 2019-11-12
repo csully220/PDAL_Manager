@@ -119,10 +119,10 @@ class Example(Frame):
         grp_misc.grid(row=2, column=0)
         grp_misc.config(padx=10, pady=20)
         # Generate list of files
-        btn_filelist = Button(grp_misc, text="Gen file list", command=self.save_file_list)
+        btn_filelist = Button(grp_misc, text="Export directory contents to .txt", command=self.save_file_list)
         btn_filelist.grid(row=0, column=0)
         # Validate filenames
-        btn_validate = Button(grp_misc, text="Check CAE filenames", command=self.val_filenames)
+        btn_validate = Button(grp_misc, text="Validate CAE filenames", command=self.val_filenames)
         btn_validate.grid(row=0, column=1)
         # Check /pdf subdirectory for pdf corresponding to native files
         btn_verify_pdfs = Button(grp_misc, text="Check for PDFs", command=self.verify_pdfs)
@@ -131,8 +131,8 @@ class Example(Frame):
         btn_verify_pdf_dates = Button(grp_misc, text="Check PDF mod date", command=self.verify_pdf_dates)
         btn_verify_pdf_dates.grid(row=0, column=3)
         # Quit
-        btn_quit = Button(grp_misc, text="Quit", command=self.master.destroy)
-        btn_quit.grid(row=0, column=4)
+        btn_quit = Button(self.master, text="Quit", command=self.master.destroy)
+        btn_quit.grid(row=3, column=0)
 
 
     def choose_dir1(self): 
@@ -201,12 +201,13 @@ class Example(Frame):
                     print(repr(e))
 
     def save_file_list(self):
-        files = os.listdir(filedialog.askdirectory())
-        outfile = open("file_list.txt", "w")
+        file_dir = filedialog.askdirectory()
+        files = os.listdir(file_dir)
+        outfile = open(file_dir + "/file_list.txt", "w")
         for f in files:
             outfile.write(f + "\n")
         outfile.close()
-        popupmsg("List saved to " + str(os.getcwd()) + "\\file_list.txt")
+        popupmsg("List saved to " + file_dir + "/file_list.txt")
 
     def verify_pdfs(self):
         no_pdfs = check_for_pdfs(filedialog.askdirectory())
