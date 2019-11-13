@@ -142,6 +142,14 @@ def srch_superseded(srch_dir=""):
             continue
     return rtn_list
 
+def validate_CAE_filenames(srch_dir=""):
+    files = os.listdir(srch_dir)
+    rtn_list = []
+    for f in files:
+        if (not validate_CAE_filename(f)):
+            rtn_list.append(f)
+    return rtn_list
+
 def validate_CAE_filename(file=""):
     # Desired format is SERIAL NUM | TAB NUM | TYPE | REV
     # e.g. MA399477_10_PL_A.pdf
