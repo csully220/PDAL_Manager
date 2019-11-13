@@ -28,11 +28,12 @@ class Example(Frame):
         # add File Menu to Menu Bar
         menu.add_cascade(label="File", menu=file)
 
-        # Validate Menu
+        # Tools Menu
         edit = Menu(menu, tearoff=0)
         edit.add_command(label="Scan for PDFs", command=self.pdfs_exist)
+        edit.add_command(label="Remove .bak", command=self.remove_bak)
         # Add Validate Menu to Menu Bar
-        menu.add_cascade(label="Validate", menu=edit)
+        menu.add_cascade(label="Tools", menu=edit)
         
 
         # Style and padding
@@ -111,6 +112,23 @@ class Example(Frame):
                     for fn in no_pdfs:
                         #print(fn)
                         self.lstbx_files.insert("end", m_f + "\\" + fn)
+            except:
+                popupmsg("Encountered problem with " + m_f)
+
+    def remove_bak(self):
+        m_filename = "folders.txt"
+        m_folders = ""
+        try:
+            m_folders = open(m_filename, "r")
+        except:
+            popupmsg("folders.txt not found")
+        for m_f in m_folders:
+            if m_f[0] == "#":
+                continue
+            print(m_f.strip())
+            try:
+                m_baks = delete_bak_files(m_f.strip())
+                print(m_baks)
             except:
                 popupmsg("Encountered problem with " + m_f)
 

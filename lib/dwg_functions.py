@@ -1,10 +1,27 @@
-import os
+import os, stat
 import re
 import sys
 import ntpath
 import math
 import itertools
-        
+
+def delete_bak_files(nat_dir=""):
+    if len(nat_dir) > 0:
+        files = os.listdir(nat_dir)
+        for nf in files:
+            if os.path.isdir(nat_dir + "/" + nf):
+                continue
+            nf_split = nf.split('.')
+            nf_ext = nf_split[-1]
+            if (nf_ext == "bak"):
+                #rtn_list.append(nf)
+                rel_path = nat_dir + "\\" + nf
+                try:
+                    os.chmod(rel_path, stat.S_IWRITE)
+                    os.remove(rel_path)
+                    print("Removed " + rel_path)
+                except Exception as e:
+                    print(repr(e))  
 
 def check_for_pdfs(nat_dir=""):
     rtn_list = []
