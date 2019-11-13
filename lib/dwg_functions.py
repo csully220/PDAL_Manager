@@ -4,8 +4,8 @@ import sys
 import ntpath
 import math
 import itertools
+        
 
-           
 def check_for_pdfs(nat_dir=""):
     rtn_list = []
     if len(nat_dir) > 0:
