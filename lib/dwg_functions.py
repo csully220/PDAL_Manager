@@ -6,6 +6,7 @@ import math
 import itertools
 
 def delete_bak_files(nat_dir=""):
+    rtn_list = []
     if len(nat_dir) > 0:
         files = os.listdir(nat_dir)
         for nf in files:
@@ -19,9 +20,10 @@ def delete_bak_files(nat_dir=""):
                 try:
                     os.chmod(rel_path, stat.S_IWRITE)
                     os.remove(rel_path)
-                    print("Removed " + rel_path)
+                    rtn_list.append(rel_path)
                 except Exception as e:
-                    print(repr(e))  
+                    print(repr(e))
+        return rtn_list        
 
 def check_for_pdfs(nat_dir=""):
     rtn_list = []

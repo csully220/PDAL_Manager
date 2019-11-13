@@ -122,15 +122,22 @@ class Example(Frame):
             m_folders = open(m_filename, "r")
         except:
             popupmsg("folders.txt not found")
+        m_found = False
         for m_f in m_folders:
             if m_f[0] == "#":
                 continue
-            print(m_f.strip())
             try:
                 m_baks = delete_bak_files(m_f.strip())
-                print(m_baks)
+                if (len(m_baks) > 0):
+                    self.lstbox_lbl.set(".bak files found and deleted:")
+                    self.lstbox_export_fn = "deleted_baks.txt"
+                    for bf in m_baks:
+                        self.lstbx_files.insert("end", m_f + "\\" + bf)
+                    #print(m_baks)
             except:
                 popupmsg("Encountered problem with " + m_f)
+        if (not m_found):
+            popupmsg("No .bak files found")
 
     def export_listbox(self):
         path = self.pdal_dir.get() + "\\" + self.lstbox_export_fn
