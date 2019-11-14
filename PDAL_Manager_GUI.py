@@ -2,8 +2,10 @@
 from tkinter import Tk, W, E, filedialog, StringVar, LabelFrame, Listbox, Menu
 from tkinter.ttk import Frame, Button, Entry, Style, Label
 from lib.dwg_functions import *
+from lib.BPL_utils import *
 from shutil import copyfile
-import os, stat
+import os, stat, ntpath
+
 
 class Example(Frame):
 
@@ -41,15 +43,29 @@ class Example(Frame):
         self.columnconfigure(0, pad=3) 
         self.rowconfigure(0, pad=3)
 
+
+
         # Widget variables
         # Full path to PDAL
         self.pdal_dir = StringVar()
+               
         # Name of PDAL TLD
         self.pdal_name = StringVar()
         self.pdal_name.set("No PDAL selected")
+
+        # Listbox for drawing filenames
         self.lstbox_lbl = StringVar()
         self.lstbox_lbl.set("Files:")
         self.lstbox_export_fn = "export.txt"
+
+        # Full path to cable CSV file
+        self.cable_csv_path = StringVar()
+        self.cable_csv_path.set("No CSV file selected")
+        # Cable assy dwg number
+        self.cable_assy_num = StringVar()
+        self.cable_assy_num.set("No cable labels")
+
+
 
         # Configure the main widget group
         grp_main = LabelFrame(self.master, text="PDAL")
@@ -68,13 +84,39 @@ class Example(Frame):
         btn_export_lstbx = Button(grp_main, text="Export Listbox", command=self.export_listbox)
         btn_export_lstbx.grid(row=2, column=2)
 
-        #debug set PDAL directory
+        # debug set PDAL directory
         self.pdal_dir.set(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
         os.chdir(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
         self.pdal_name.set("MH-47-2_PDAL")
+
+
+
+        # Configure the cable labels widget group
+        grp_cbllbl = LabelFrame(self.master, text="Cable Labels")
+        grp_cbllbl.grid(row=1, column=0)
+        grp_cbllbl.config(padx=50, pady=20)
         
+        # Cable label file path
+        cable_label_file = Label(grp_cbllbl, textvariable = self.cable_csv_path, width=40)
+        cable_label_file.grid(row=0, column=0)
+        btn_open_cable_csv = Button(grp_cbllbl, text="Open cable label CSV", command=self.open_cable_csv)
+        btn_open_cable_csv.grid(row=1, column=0)
+
+        # Cable Label Listbox
+        lstbx_cables_lbl = Label(grp_cbllbl, textvariable = self.cable_assy_num)
+        lstbx_cables_lbl.grid(row=0, column=1)
+        self.lstbx_cables = Listbox(grp_cbllbl, selectmode="extended", width=80)
+        self.lstbx_cables.grid(row=1, column=1)
+        
+        btn_print_labels = Button(grp_cbllbl, text="Print labels", command=self.print_labels)
+        btn_print_labels.grid(row=2, column=1)
+
         btn_quit = Button(self.master, text="Quit", command=self.master.destroy)
         btn_quit.grid(row=3, column=0)
+
+
+
+
 
     def open_pdal(self):
         m_dir = filedialog.askdirectory()
@@ -170,6 +212,33 @@ class Example(Frame):
             m_file.write(item + "\n")
         m_file.close()
         popupmsg("Saved to " + path)
+
+
+    def open_cable_csv(self):
+        filepath = filedialog.askopenfilename()
+        self.cable_csv_path.set(filepath)
+        fp_sp = ntpath.split(filepath)
+        filename = fp_sp[1]
+        fn_sp = filename.split(".")
+        self.cable_assy_num.set(fn_sp[0])
+        f_csv = open(filepath, "r")
+        for line in f_csv:
+            self.lstbx_cables.insert("end", line)
+            
+    def print_labels(self):
+        cbllbl_dir = self.cable_assy_num.get()
+        if(not os.path.isdir(cbllbl_dir)):
+            os.mkdir(cbllbl_dir)
+        filepath = self.cable_csv_path.get()
+        GenerateXMLinFives(cbllbl_dir, filepath)
+        #self.lstbx_cables.insert("end", "Saved to " + filepath)
+        #self.lstbx_cables.insert("end", "Ready to print...")
+        lbl_files = os.listdir(cbllbl_dir)
+        for f in lbl_files:
+            SendToBP33(cbllbl_dir + "\\" + f, False)
+            self.lstbx_cables.insert("end", "Sent " + f + " to printer")
+        self.lstbx_cables.insert("end", "Finished!")
+        
 
 def popupmsg(msg):
     popup = Tk()
