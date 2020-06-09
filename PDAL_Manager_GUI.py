@@ -250,6 +250,8 @@ class Example(Frame):
         msg += "\nCAE\\Drawings"
         msg += "\nCAE\\Schematics"
         msg += "\nVEC\\assembly"
+        msg += "\n\nTo omit directories from scan, prefix with #"
+        msg += "\ne.g. #VEC\\assembly"
         popupmsg(msg)
 
 
