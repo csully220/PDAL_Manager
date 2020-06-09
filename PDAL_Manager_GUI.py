@@ -37,6 +37,12 @@ class Example(Frame):
         edit.add_command(label="Scan CAE filenames", command=self.CAE_filenames_valid)
         # Add Validate Menu to Menu Bar
         menu.add_cascade(label="Tools", menu=edit)
+
+        # Help Menu
+        helpmenu = Menu(menu, tearoff=0)
+        helpmenu.add_command(label="How to", command=self.howto_popup)
+        menu.add_cascade(label="Help",menu=helpmenu)
+
         
         # Style and padding
         Style().configure("TButton", padding=(3, 5, 3, 5), font='serif 10')
@@ -85,9 +91,9 @@ class Example(Frame):
         btn_export_lstbx.grid(row=2, column=2)
 
         # debug set PDAL directory
-        self.pdal_dir.set(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
-        os.chdir(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
-        self.pdal_name.set("MH-47-2_PDAL")
+        #self.pdal_dir.set(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
+        #os.chdir(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
+        self.pdal_name.set("Choose PDAL")
 
 
 
@@ -239,6 +245,13 @@ class Example(Frame):
             self.lstbx_cables.insert("end", "Sent " + f + " to printer")
         self.lstbx_cables.insert("end", "Finished!")
         
+    def howto_popup(self):
+        msg = "folders.txt file goes in top level directory. Each line \ncontains path to folder with native files. For example:\n"
+        msg += "\nCAE\\Drawings"
+        msg += "\nCAE\\Schematics"
+        msg += "\nVEC\\assembly"
+        popupmsg(msg)
+
 
 def popupmsg(msg):
     popup = Tk()
