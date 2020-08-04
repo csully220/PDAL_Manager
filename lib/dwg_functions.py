@@ -5,6 +5,18 @@ import ntpath
 import math
 import itertools
 
+
+def compare_files_with_list(nat_dir="", filelist=[]):
+    rtn_list = []
+    if len(nat_dir) > 0:
+        files = os.listdir(nat_dir)
+        for nf in files:
+            if os.path.isdir(nat_dir + "/" + nf):
+                continue
+            if nf not in filelist:
+                rtn_list.append(nf)
+        return rtn_list        
+
 def delete_bak_files(nat_dir=""):
     rtn_list = []
     if len(nat_dir) > 0:

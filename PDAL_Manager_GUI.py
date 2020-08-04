@@ -17,7 +17,8 @@ class Example(Frame):
         self.initUI()
  
     def initUI(self):
-        self.master.title("SOFASTe PDAL Manager")
+        
+        self.master.title("Veraxx SOFASTe PDAL Manager")
 
         # Menu Bar
         menu = Menu(self.master)
@@ -29,26 +30,26 @@ class Example(Frame):
         # add File Menu to Menu Bar
         menu.add_cascade(label="File", menu=file)
 
-        # Tools Menu
+        # Actions Menu
         edit = Menu(menu, tearoff=0)
         edit.add_command(label="Scan for PDFs", command=self.pdfs_exist)
         edit.add_command(label="Remove .bak files", command=self.remove_bak)
-        edit.add_command(label="Scan for superseded", command=self.find_superseded)
+        edit.add_command(label="Scan all for superseded", command=self.find_superseded)
+        edit.add_command(label="Scan folder for superseded", command=self.find_superseded_in_folder)
         edit.add_command(label="Scan CAE filenames", command=self.CAE_filenames_valid)
+        edit.add_command(label="Find \"forgot to introduce\"", command=self.find_files_not_introduced)
         # Add Validate Menu to Menu Bar
-        menu.add_cascade(label="Tools", menu=edit)
+        menu.add_cascade(label="Actions", menu=edit)
 
         # Help Menu
         helpmenu = Menu(menu, tearoff=0)
         helpmenu.add_command(label="How to", command=self.howto_popup)
         menu.add_cascade(label="Help",menu=helpmenu)
 
-        
         # Style and padding
         Style().configure("TButton", padding=(3, 5, 3, 5), font='serif 10')
         self.columnconfigure(0, pad=3) 
         self.rowconfigure(0, pad=3)
-
 
 
         # Widget variables
@@ -120,7 +121,7 @@ class Example(Frame):
         btn_quit = Button(self.master, text="Quit", command=self.master.destroy)
         btn_quit.grid(row=3, column=0)
 
-
+        self.load_persistent()
 
 
 
@@ -142,7 +143,51 @@ class Example(Frame):
             for fn in invalid:
                 self.lstbx_files.insert("end", fn)
 
+    def find_files_not_introduced(self):
+        # folders.txt lists all folders containing native format files
+        # it is saved in the PDAL top level directory, e.g. LASAR_PDAL\folders.txt
+        m_filename = "folders.txt"
+        m_introfilename = "introduced.txt"
+        m_folders = ""
+        try:
+            m_folders = open(m_filename, "r")
+            m_introfiles = open(m_filename, "r")
+        except:
+            popupmsg("File missing. Need both\n folders.txt and introduced.txt")
+
+        self.lstbx_files.delete(0, "end")
+        for m_folder in m_folders:
+            if m_folder[0] == "#" or m_folder[0] == "\n":
+                continue
+            self.lstbox_lbl.set("Files not introduced:")
+            not_introduced = compare_files_with_list(m_folder.strip(), m_introfiles)
+            for fn in not_introduced:
+                self.lstbx_files.insert("end", fn)
+
+    def load_persistent(self):
+        # folders.txt lists all folders containing native format files
+        # it is saved in the PDAL top level directory, e.g. LASAR_PDAL\folders.txt
+        m_filename = "pdalmgr.cfg"
+        try:
+            m_options = open(m_filename, "r")
+        except:
+            popupmsg("pdalmgr.cfg not found")
+        for m_opt in m_options:
+            if m_opt[0] == "#":
+                continue
+            spl_opt = m_opt.split(" ")
+            if spl_opt[0] == "default_pdal_dir" and spl_opt[1] == "=":
+                m_dir = spl_opt[2]
+                print(m_dir)
+                os.chdir(m_dir)
+                self.pdal_dir.set(m_dir)
+                m_name = m_dir.split('/')
+                m_name = m_name[-1]
+                self.pdal_name.set(m_name)
+
     def find_superseded(self):
+        # folders.txt lists all folders containing native format files
+        # it is saved in the PDAL top level directory, e.g. LASAR_PDAL\folders.txt
         m_filename = "folders.txt"
         m_folders = ""
         try:
@@ -151,7 +196,7 @@ class Example(Frame):
             popupmsg("folders.txt not found")
         self.lstbx_files.delete(0, "end")
         for m_folder in m_folders:
-            if m_folder[0] == "#":
+            if m_folder[0] == "#" or m_folder[0] == "\n":
                 continue
             self.lstbox_lbl.set("Superseded files:")
             self.lstbox_export_fn = "superseded.txt"
@@ -163,6 +208,21 @@ class Example(Frame):
                         self.lstbx_files.insert("end", m_folder + "\\" + sup_f)
             except:
                 popupmsg("Encountered problem with " + m_folder)
+
+    def find_superseded_in_folder(self):
+        m_dir = filedialog.askdirectory()
+        self.lstbx_files.delete(0, "end")
+        if(m_dir):
+            self.lstbox_lbl.set("Superseded files:")
+            self.lstbox_export_fn = "superseded.txt"
+            try:
+                superseded = srch_superseded(m_dir)
+                if len(superseded) > 0:
+                    for sup_f in superseded:
+                        #print(fn)
+                        self.lstbx_files.insert("end", m_dir + "\\" + sup_f)
+            except:
+                popupmsg("Encountered problem with " + m_dir)
 
     def pdfs_exist(self):
         m_filename = "folders.txt"
