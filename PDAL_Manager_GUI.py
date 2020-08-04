@@ -149,20 +149,34 @@ class Example(Frame):
         m_filename = "folders.txt"
         m_introfilename = "introduced.txt"
         m_folders = ""
+        m_filelist = []
         try:
             m_folders = open(m_filename, "r")
-            m_introfiles = open(m_filename, "r")
+            m_introfiles = open(m_introfilename, "r")
         except:
             popupmsg("File missing. Need both\n folders.txt and introduced.txt")
+
+        for fullfn in m_introfiles:
+            spl_fullfn = fullfn.split("/")
+            newfn = spl_fullfn[-1].strip("\n")
+            m_filelist.append(newfn)
+            #print(newfn)
 
         self.lstbx_files.delete(0, "end")
         for m_folder in m_folders:
             if m_folder[0] == "#" or m_folder[0] == "\n":
                 continue
             self.lstbox_lbl.set("Files not introduced:")
-            not_introduced = compare_files_with_list(m_folder.strip(), m_introfiles)
+            not_introduced = compare_files_with_list(m_folder.strip(), m_filelist)
             for fn in not_introduced:
                 self.lstbx_files.insert("end", fn)
+            
+                try:
+                    not_introduced = compare_files_with_list(m_folder.strip() + "\\pdf", m_filelist)
+                    for fn in not_introduced:
+                        self.lstbx_files.insert("end", fn)
+                except:
+                    print("No pdf folder")
 
     def load_persistent(self):
         # folders.txt lists all folders containing native format files

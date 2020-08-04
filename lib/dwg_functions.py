@@ -6,15 +6,18 @@ import math
 import itertools
 
 
+# Used to find files that are present in local PDAL but were not checked in to Razor
 def compare_files_with_list(nat_dir="", filelist=[]):
     rtn_list = []
     if len(nat_dir) > 0:
         files = os.listdir(nat_dir)
-        for nf in files:
-            if os.path.isdir(nat_dir + "/" + nf):
+        for fn in files:
+            filepath = nat_dir + "\\" + fn
+            if os.path.isdir(filepath):
                 continue
-            if nf not in filelist:
-                rtn_list.append(nf)
+            if fn not in filelist:
+                #print(filepath)
+                rtn_list.append(fn)
         return rtn_list        
 
 def delete_bak_files(nat_dir=""):
@@ -22,7 +25,7 @@ def delete_bak_files(nat_dir=""):
     if len(nat_dir) > 0:
         files = os.listdir(nat_dir)
         for nf in files:
-            if os.path.isdir(nat_dir + "/" + nf):
+            if os.path.isdir(nat_dir + "\\" + nf):
                 continue
             nf_split = nf.split('.')
             nf_ext = nf_split[-1]
