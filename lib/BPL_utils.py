@@ -67,7 +67,7 @@ def GenerateXMLfromList(lbls, fn):
                 f_bpl.write('        <!-- LABEL ' + str(n + 1) + ' -->\n')
                 n+=1
                 f_bpl.write(xml_label)
-                
+
                 txt_height = ['1.42', '1.65', '1.88']
                 for i in range(len(lines)):
                     line = lines[i].strip().strip("'")
@@ -91,9 +91,6 @@ def GenerateXML():
     root = tk.Tk()
     root.withdraw()
 
-    # Get the filename containing label information.
-    #fn_csv = input('Enter filename: ')
-    #fn_csv = 'A02055_A.txt'
     print("Select the CSV file exported from AutoCAD containing label information...")
     fp_csv = filedialog.askopenfilename()
     fp_csv_sp = ntpath.split(fp_csv)
@@ -103,7 +100,6 @@ def GenerateXML():
     # Create a BPL file for writing to
     fn_bpl = fn_csv.split('.')
     fn_bpl = fn_bpl[0] + '.xml'
-
     f_bpl = open(fn_bpl, "w")
 
     # BPL Document opening tags
@@ -117,20 +113,15 @@ def GenerateXML():
 
     # Start labels
     f_bpl.write(xml_labels)
-
     for n in range(num_lines):
 
         # Start label
-
         label = f_csv.readline()
         if ( len(label.strip()) > 0 ):
-
             lines = label.split(',')
-
             # Write text tag for each of the three lines
             f_bpl.write('        <!-- LABEL ' + str(n + 1) + ' -->\n')
             f_bpl.write(xml_label)
-            
             txt_height = ['1.42', '1.65', '1.88']
             for i in range(len(lines)):
                 line = lines[i].strip().strip("'")
@@ -140,25 +131,23 @@ def GenerateXML():
                     f_bpl.write('                <text-sizing>\n                    <manual height="' + txt_height[i] + '" width="2" font-size="9" />\n                </text-sizing>\n')
                     f_bpl.write('                <datasource>\n                    <static-text value="' + line + '" />\n                </datasource>\n')
                     f_bpl.write('            </text>\n')
-
             # Close the label tag
             f_bpl.write('        </label>\n')
 
     # Close labels and document tags
     f_bpl.write('    </labels>\n')
     f_bpl.write('</bpl-document>')
-
     f_bpl.close()
-
     print('Generated ' + fn_bpl + '.')
 
 def SendToBP33(fn_bpl, req_confirm = True):
 
+    printer_name = None
     printers = win32print.EnumPrinters(2)
     for p in printers:
-        if p[3] == 'BBP33':
+        if p[2] == 'BBP33':
             printer_name = p[2]
-            #print('Found printer ' + printer_name)
+            print('Found printer ' + printer_name)
 
     if (printer_name):
         cont = 'y'
@@ -178,6 +167,6 @@ def SendToBP33(fn_bpl, req_confirm = True):
             finally:
               win32print.ClosePrinter (hPrinter)
             f_bpl.close()
-        else:
-            print('Aborted')
+    else:
+        print('Aborted')
 

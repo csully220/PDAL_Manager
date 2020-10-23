@@ -4,20 +4,17 @@ from tkinter.ttk import Frame, Button, Entry, Style, Label
 from lib.dwg_functions import *
 from lib.BPL_utils import *
 from shutil import copyfile
-import os, stat, ntpath
+import os, stat, ntpath, time
 
 
 class Example(Frame):
 
-    # top level directory containing PDAL
-    
-    
     def __init__(self): 
         super().__init__() 
         self.initUI()
  
     def initUI(self):
-        
+        self.home_dir = os.getcwd()
         self.master.title("Veraxx SOFASTe PDAL Manager")
 
         # Menu Bar
@@ -51,7 +48,6 @@ class Example(Frame):
         self.columnconfigure(0, pad=3) 
         self.rowconfigure(0, pad=3)
 
-
         # Widget variables
         # Full path to PDAL
         self.pdal_dir = StringVar()
@@ -59,6 +55,8 @@ class Example(Frame):
         # Name of PDAL TLD
         self.pdal_name = StringVar()
         self.pdal_name.set("No PDAL selected")
+
+        self.load_persistent()
 
         # Listbox for drawing filenames
         self.lstbox_lbl = StringVar()
@@ -72,17 +70,15 @@ class Example(Frame):
         self.cable_assy_num = StringVar()
         self.cable_assy_num.set("No cable labels")
 
-
-
         # Configure the main widget group
         grp_main = LabelFrame(self.master, text="PDAL")
         grp_main.grid(row=0, column=0)
         grp_main.config(padx=50, pady=20)
 
         # PDAL directory
-        self.pdal_dir.set(r"C:\\")
         label_pdal_name = Label(grp_main, textvariable = self.pdal_name, width=40)
         label_pdal_name.grid(row=0, column=1)
+        
         # Listbox
         lstbx_files_lbl = Label(grp_main, textvariable = self.lstbox_lbl)
         lstbx_files_lbl.grid(row=0, column=2)
@@ -90,13 +86,6 @@ class Example(Frame):
         self.lstbx_files.grid(row=1, column=2)
         btn_export_lstbx = Button(grp_main, text="Export Listbox", command=self.export_listbox)
         btn_export_lstbx.grid(row=2, column=2)
-
-        # debug set PDAL directory
-        #self.pdal_dir.set(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
-        #os.chdir(r"C:\Users\Csullivan\Desktop\razor_work\!PDAL\mh47-2_pdal\submissions\ver_1.3\MH-47-2_PDAL")
-        self.pdal_name.set("Choose PDAL")
-
-
 
         # Configure the cable labels widget group
         grp_cbllbl = LabelFrame(self.master, text="Cable Labels")
@@ -121,18 +110,39 @@ class Example(Frame):
         btn_quit = Button(self.master, text="Quit", command=self.master.destroy)
         btn_quit.grid(row=3, column=0)
 
-        self.load_persistent()
+        
 
 
 
     def open_pdal(self):
         m_dir = filedialog.askdirectory()
-        os.chdir(m_dir)
-        self.pdal_dir.set(m_dir)
-        m_name = m_dir.split('/')
-        m_name = m_name[-1]
-        self.pdal_name.set(m_name)
+        if(m_dir):
+            os.chdir(m_dir)
+            print('Loading ' + m_dir)
+            self.pdal_dir.set(m_dir)
+            m_name = m_dir.split('/')
+            m_name = m_name[-1]
+            self.pdal_name.set(m_name)
 
+    def load_persistent(self):
+        m_filename = "pdalmgr.cfg"
+        try:
+            m_options = open(m_filename, "r")
+        except:
+            popupmsg("pdalmgr.cfg not found")
+        for m_opt in m_options:
+            if m_opt[0] == "#":
+                continue
+            spl_opt = m_opt.split(" ")
+            if spl_opt[0] == "default_pdal_dir" and spl_opt[1] == "=":
+                m_dir = spl_opt[2].strip()
+                print('Loading ' + m_dir)
+                os.chdir(m_dir)
+                self.pdal_dir.set(m_dir)
+                m_name = m_dir.split('/')
+                m_name = m_name[-1]
+                self.pdal_name.set(m_name)
+                
     def CAE_filenames_valid(self):
         m_dir = filedialog.askdirectory()
         invalid = validate_CAE_filenames(m_dir)
@@ -178,26 +188,6 @@ class Example(Frame):
                 except:
                     print("No pdf folder")
 
-    def load_persistent(self):
-        # folders.txt lists all folders containing native format files
-        # it is saved in the PDAL top level directory, e.g. LASAR_PDAL\folders.txt
-        m_filename = "pdalmgr.cfg"
-        try:
-            m_options = open(m_filename, "r")
-        except:
-            popupmsg("pdalmgr.cfg not found")
-        for m_opt in m_options:
-            if m_opt[0] == "#":
-                continue
-            spl_opt = m_opt.split(" ")
-            if spl_opt[0] == "default_pdal_dir" and spl_opt[1] == "=":
-                m_dir = spl_opt[2]
-                print(m_dir)
-                os.chdir(m_dir)
-                self.pdal_dir.set(m_dir)
-                m_name = m_dir.split('/')
-                m_name = m_name[-1]
-                self.pdal_name.set(m_name)
 
     def find_superseded(self):
         # folders.txt lists all folders containing native format files
@@ -293,7 +283,6 @@ class Example(Frame):
         m_file.close()
         popupmsg("Saved to " + path)
 
-
     def open_cable_csv(self):
         filepath = filedialog.askopenfilename()
         self.cable_csv_path.set(filepath)
@@ -301,24 +290,27 @@ class Example(Frame):
         filename = fp_sp[1]
         fn_sp = filename.split(".")
         self.cable_assy_num.set(fn_sp[0])
+        self.lstbx_cables.delete(0, "end")
         f_csv = open(filepath, "r")
         for line in f_csv:
             self.lstbx_cables.insert("end", line)
-            
+
     def print_labels(self):
         cbllbl_dir = self.cable_assy_num.get()
+        cbllbl_dir = self.home_dir + '\\print\\' + cbllbl_dir
         if(not os.path.isdir(cbllbl_dir)):
             os.mkdir(cbllbl_dir)
         filepath = self.cable_csv_path.get()
         GenerateXMLinFives(cbllbl_dir, filepath)
-        #self.lstbx_cables.insert("end", "Saved to " + filepath)
-        #self.lstbx_cables.insert("end", "Ready to print...")
         lbl_files = os.listdir(cbllbl_dir)
         for f in lbl_files:
             SendToBP33(cbllbl_dir + "\\" + f, False)
-            self.lstbx_cables.insert("end", "Sent " + f + " to printer")
-        self.lstbx_cables.insert("end", "Finished!")
-        
+            time.sleep(2)
+            #self.lstbx_cables.insert("end", "Sent " + f + " to printer")
+            print("Sent " + f + " to printer")
+        #self.lstbx_cables.insert("end", "Finished!")
+        print("Finished!")
+
     def howto_popup(self):
         msg = "folders.txt file goes in top level directory. Each line \ncontains path to folder with native files. For example:\n"
         msg += "\nCAE\\Drawings"
