@@ -7,6 +7,7 @@ from shutil import copyfile
 import os, stat, ntpath, time
 
 
+
 class Example(Frame):
 
     def __init__(self): 
@@ -78,7 +79,10 @@ class Example(Frame):
         # PDAL directory
         label_pdal_name = Label(grp_main, textvariable = self.pdal_name, width=40)
         label_pdal_name.grid(row=0, column=1)
-        
+
+        label_pdal_path = Label(grp_main, textvariable = self.pdal_dir, width=80)
+        label_pdal_path.grid(row=3, column=1)
+
         # Listbox
         lstbx_files_lbl = Label(grp_main, textvariable = self.lstbox_lbl)
         lstbx_files_lbl.grid(row=0, column=2)
@@ -107,11 +111,8 @@ class Example(Frame):
         btn_print_labels = Button(grp_cbllbl, text="Print labels", command=self.print_labels)
         btn_print_labels.grid(row=2, column=1)
 
-        btn_quit = Button(self.master, text="Quit", command=self.master.destroy)
+        btn_quit = Button(self.master, text="Quit", command=self.quit)
         btn_quit.grid(row=3, column=0)
-
-        
-
 
 
     def open_pdal(self):
@@ -123,6 +124,8 @@ class Example(Frame):
             m_name = m_dir.split('/')
             m_name = m_name[-1]
             self.pdal_name.set(m_name)
+        else:
+            popupmsg("Directory not found")
 
     def load_persistent(self):
         m_filename = "pdalmgr.cfg"
@@ -137,11 +140,15 @@ class Example(Frame):
             if spl_opt[0] == "default_pdal_dir" and spl_opt[1] == "=":
                 m_dir = spl_opt[2].strip()
                 print('Loading ' + m_dir)
-                os.chdir(m_dir)
-                self.pdal_dir.set(m_dir)
-                m_name = m_dir.split('/')
-                m_name = m_name[-1]
-                self.pdal_name.set(m_name)
+                try:
+                    os.chdir(m_dir)
+                    self.pdal_dir.set(m_dir)
+                    m_name = m_dir.split('/')
+                    m_name = m_name[-1]
+                    self.pdal_name.set(m_name)
+                except:
+                    popupmsg("Directory not found")
+        m_options.close()
                 
     def CAE_filenames_valid(self):
         m_dir = filedialog.askdirectory()
@@ -187,6 +194,9 @@ class Example(Frame):
                         self.lstbx_files.insert("end", fn)
                 except:
                     print("No pdf folder")
+        m_folders.close()
+        m_introfiles.close()
+        popupmsg("Scan complete")
 
 
     def find_superseded(self):
@@ -212,6 +222,8 @@ class Example(Frame):
                         self.lstbx_files.insert("end", m_folder + "\\" + sup_f)
             except:
                 popupmsg("Encountered problem with " + m_folder)
+        m_folders.close()
+        popupmsg("Scan complete")
 
     def find_superseded_in_folder(self):
         m_dir = filedialog.askdirectory()
@@ -227,6 +239,7 @@ class Example(Frame):
                         self.lstbx_files.insert("end", m_dir + "\\" + sup_f)
             except:
                 popupmsg("Encountered problem with " + m_dir)
+        popupmsg("Scan complete")
 
     def pdfs_exist(self):
         m_filename = "folders.txt"
@@ -248,8 +261,11 @@ class Example(Frame):
                     for fn in no_pdfs:
                         #print(fn)
                         self.lstbx_files.insert("end", m_f + "\\" + fn)
-            except:
+            except Exception as e:
+                print(e)
                 popupmsg("Encountered problem with " + m_f)
+        m_folders.close()
+        popupmsg("Scan complete")
 
     def remove_bak(self):
         m_filename = "folders.txt"
@@ -274,6 +290,8 @@ class Example(Frame):
                 popupmsg("Encountered problem with " + m_f)
         if (not m_found):
             popupmsg("No .bak files found")
+        m_folders.close()
+        popupmsg("BAK file scan complete")
 
     def export_listbox(self):
         path = self.pdal_dir.get() + "\\" + self.lstbox_export_fn
@@ -294,6 +312,7 @@ class Example(Frame):
         f_csv = open(filepath, "r")
         for line in f_csv:
             self.lstbx_cables.insert("end", line)
+        f_csv.close()
 
     def print_labels(self):
         cbllbl_dir = self.cable_assy_num.get()
@@ -320,6 +339,20 @@ class Example(Frame):
         msg += "\ne.g. #VEC\\assembly"
         popupmsg(msg)
 
+    def quit(self):
+        m_filename = self.home_dir + "\pdalmgr.cfg"
+        print(m_filename)
+        try:
+            with open(m_filename, "r") as file:
+                m_options = file.readlines()
+                m_options[1] = "default_pdal_dir = " + self.pdal_dir.get() + "\n"
+            with open(m_filename, 'w') as file:
+                file.writelines( m_options )
+                file.close()
+        except Exception as e:
+            popupmsg(e)
+            
+        self.master.destroy()
 
 def popupmsg(msg):
     popup = Tk()
