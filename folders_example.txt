@@ -1,0 +1,14 @@
+# contains list of all directories containing native CAD files (or xls, doc, etc.)
+# each directory must also contain a folder named pdf that contains pdf format of each native file
+#Aechelon
+Aegis
+L3-AMI\assembly
+L3-AMI\parts_list
+L3-AMI\schematic
+L3-AMI\wire_list
+VEC\assembly
+VEC\detail
+VEC\installation
+VEC\schematic
+VEC\specification
+VEC\tree

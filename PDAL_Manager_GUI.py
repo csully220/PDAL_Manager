@@ -148,6 +148,7 @@ class Example(Frame):
                     self.pdal_name.set(m_name)
                 except:
                     popupmsg("Directory not found")
+                    self.pdal_name.set("None")
         m_options.close()
                 
     def CAE_filenames_valid(self):
@@ -340,7 +341,7 @@ class Example(Frame):
         popupmsg(msg)
 
     def quit(self):
-        m_filename = self.home_dir + "\pdalmgr.cfg"
+        m_filename = self.home_dir + "\\pdalmgr.cfg"
         print(m_filename)
         try:
             with open(m_filename, "r") as file:
