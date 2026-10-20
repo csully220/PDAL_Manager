@@ -124,25 +124,31 @@ def compare_new_revs(dir1="", dir2=""):
 def srch_superseded(srch_dir=""):
     files = os.listdir(srch_dir)
     rtn_list = []
-    for file, cfile in itertools.combinations(files, 2):
-    #compare(file, cfile)
-    #for file in files:
+    pairs = itertools.combinations(files, 2)
+    for file, cfile in pairs:
         try:
             fsp = file.split('.')
+            if len(fsp) < 2:
+                continue
             dwg_ext = fsp[-1]
             dwg_fn = fsp[0].upper().split('_')
-            dwg_no = "".join(dwg_fn[:-1])
-            dwg_rev = dwg_fn[-1]
+            dwg_no = "".join(dwg_fn[0])
             if len(dwg_fn) == 1:
                 dwg_rev = "-"
+            else:
+                dwg_rev = dwg_fn[-1]
 
             cfsp = cfile.split('.')
+            if len(cfsp) < 2:
+                continue
             cdwg_ext = cfsp[-1]
             cdwg_fn = cfsp[0].upper().split('_')
-            cdwg_no = "".join(cdwg_fn[:-1])
-            cdwg_rev = cdwg_fn[-1]
+            cdwg_no = "".join(cdwg_fn[0])
+            
             if len(cdwg_fn) == 1:
                 cdwg_rev = "-"
+            else:
+                cdwg_rev = cdwg_fn[-1]
 
             if dwg_no == cdwg_no and dwg_ext == cdwg_ext and cdwg_rev != dwg_rev:
                 if min(dwg_rev,cdwg_rev) == dwg_rev and not file in rtn_list:
